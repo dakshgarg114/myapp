@@ -1,26 +1,33 @@
-import { render } from '@testing-library/react';
-import React,{useEffect} from 'react';
-import {Button} from 'react-bootstrap';
-import { isBindingName } from 'typescript';
+import React from 'react';
 import '../App.css';
 import Product from './Product';
 
+import {useQuery,gql} from '@apollo/client';
+const backend_data = gql`
+{
+    post_data(order_by: {Id: desc}) {
+      Id
+      topic_data
+      topic_name
+    }
+  }
+  
+`;
 
 
-function Post(props:any) {
-    const array = props.array;
-    array.reverse();
-    console.log(array);
-    return(
-        
-        <main>
-       
-        {array.map((item:any) => (
-            <Product item={item} />
-            //<Product post={item} />
-        ))}
-        </main>
-    );
+function Post() {
+    const {loading,error,data} = useQuery(backend_data);
+    if(loading) return <p>Loading</p>
+    if(error) return <p>Error :</p>;
+    return data["post_data"].map((item:any,idx:any) =>{
+        return(
+        <div>
+            <p>
+                <Product item={item}/>
+             </p>
+        </div>
+        )
+    });
     
 }
 
